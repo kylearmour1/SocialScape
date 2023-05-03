@@ -28,6 +28,24 @@ const thoughtController = {
         res.status(400).json(err);
       });
   },
-
+// create thought
+createThought({ body }, res) {
+  Thought.create(body)
+    .then((dbThoughtData) => {
+      return User.findOneAndUpdate(
+        { _id: body.userId },
+        { $push: { thoughts: dbThoughtData._id } },
+        { new: true }
+      );
+    })
+    .then((dbUserData) => {
+      if (!dbUserData) {
+        res.status(404).json({ message: 'No user found with this id!' });
+        return;
+      }
+      res.json(dbUserData);
+    })
+    .catch((err) => res.status(400).json(err));
+}
 
 };
